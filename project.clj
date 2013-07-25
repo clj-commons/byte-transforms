@@ -11,7 +11,7 @@
                                    [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]}}
   :plugins [[codox "0.6.4"]]
   :codox {:writer codox-md.writer/write-docs
-          :include [byte-streams]}
+          :include [byte-transforms]}
   :java-source-paths ["src"]
   :javac-options ["-target" "1.5" "-source" "1.5"]
   :warn-on-reflection true

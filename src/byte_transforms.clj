@@ -106,11 +106,6 @@
     (MessageDigest/isEqual a b)
     (= a b)))
 
-(defn hash->uuid
-  "Converts a hash to a string representation of a UUID."
-  [bytes]
-  (str (UUID/nameUUIDFromBytes bytes)))
-
 (defn hash->bytes
   "Converts a hash to an array of bytes."
   [x]
@@ -118,6 +113,11 @@
     byte-array x
     Integer   (-> (ByteBuffer/allocate 4) (.putInt (int x)) .array)
     Long      (-> (ByteBuffer/allocate 8) (.putLong (long x)) .array)))
+
+(defn hash->uuid
+  "Converts a hash to a string representation of a UUID."
+  [x]
+  (str (UUID/nameUUIDFromBytes (hash->bytes x))))
 
 (defn hash->shorts
   "Converts a hash to an array of shorts."
