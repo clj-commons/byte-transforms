@@ -1,0 +1,147 @@
+<html lang="en">
+  <head>
+    <title>byte-transforms documentation</title>
+    <link href="css/default.css" type="text/css" rel="stylesheet" />
+    <link href="css/codox-md.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/page_effects.js"></script>
+  </head>
+  <body>
+    <header>
+      <div id="header">
+        <h1 class="project-title">Byte-transforms 0.1.0 API documentation</h1>
+      </div>
+    </header>
+    <navigation>
+      <div id="namespaces" class="sidebar">
+        <h3>Namespaces</h3>
+        <ul class="ns-links">
+          <li class="ns-list"><a class="ns-link ns-name" href="byte-transforms.html">byte-transforms</a></li>
+        </ul>
+      </div>
+      <div id="vars" class="sidebar">
+        <h3>Public Vars</h3>
+        <ul class="ns-var-links">
+          <li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-available-encoders">available-encoders</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-available-hash-functions">available-hash-functions</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-compress">compress</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-decode">decode</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-decompress">decompress</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-encode">encode</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-hash">hash</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-hash-%3Ebytes">hash-&gt;bytes</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-hash-%3Eints">hash-&gt;ints</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-hash-%3Elongs">hash-&gt;longs</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-hash-%3Eshorts">hash-&gt;shorts</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-hash-%3Euuid">hash-&gt;uuid</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="byte-transforms.html#var-hash%3D">hash=</a></li>
+        </ul>
+      </div>
+    </navigation>
+    <article>
+      <div id="content" class="namespace-docs">
+        <h2 class="namespace-title">byte-transforms documentation</h2>
+        <div class="doc">
+</div>
+        <div class="ns-vars">
+          <div class="public">
+            <h3><a id="var-available-encoders" class="source var-name" href="/src/byte_transforms.clj">available-encoders</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Returns a list of all available encodings.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-available-hash-functions" class="source var-name" href="/src/byte_transforms.clj">available-hash-functions</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[]</div>
+            
+            
+            <div class="doc"><p>Returns the name of all available hash functions.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-compress" class="source var-name" href="/src/byte_transforms.clj">compress</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x]</div><div class="usage">[x algorithm]</div><div class="usage">[x algorithm options]</div>
+            
+            
+            <div class="doc"><p>Takes a byte stream, and returns a compressed version.  By default, this will use Snappy.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-decode" class="source var-name" href="/src/byte_transforms.clj">decode</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x encoding]</div><div class="usage">[x encoding options]</div>
+            
+            
+            <div class="doc"><p>Takes an encoded byte stream, and returns a decoded version.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-decompress" class="source var-name" href="/src/byte_transforms.clj">decompress</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x]</div><div class="usage">[x algorithm]</div><div class="usage">[x algorithm options]</div>
+            
+            
+            <div class="doc"><p>Takes a compressed byte stream, and return an uncompressed version.  By default, this will use Snappy.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-encode" class="source var-name" href="/src/byte_transforms.clj">encode</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x encoding]</div><div class="usage">[x encoding options]</div>
+            
+            
+            <div class="doc"><p>Takes a byte stream, and returns an encoded version.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-hash" class="source var-name" href="/src/byte_transforms.clj">hash</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[bytes]</div><div class="usage">[bytes function]</div><div class="usage">[bytes function options]</div>
+            
+            
+            <div class="doc"><p>Takes a byte stream, and returns a value representing its hash, which will be an integer if
+the hash is 32 or 64-bit, or a byte array otherwise.  By default, this will use the Murmur64
+hash.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-hash-%3Ebytes" class="source var-name" href="/src/byte_transforms.clj">hash-&gt;bytes</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x]</div>
+            
+            
+            <div class="doc"><p>Converts a hash to an array of bytes.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-hash-%3Eints" class="source var-name" href="/src/byte_transforms.clj">hash-&gt;ints</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x]</div>
+            
+            
+            <div class="doc"><p>Converts a hash to an array of integers.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-hash-%3Elongs" class="source var-name" href="/src/byte_transforms.clj">hash-&gt;longs</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x]</div>
+            
+            
+            <div class="doc"><p>Converts a hash to an array of longs.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-hash-%3Eshorts" class="source var-name" href="/src/byte_transforms.clj">hash-&gt;shorts</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x]</div>
+            
+            
+            <div class="doc"><p>Converts a hash to an array of shorts.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-hash-%3Euuid" class="source var-name" href="/src/byte_transforms.clj">hash-&gt;uuid</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[x]</div>
+            
+            
+            <div class="doc"><p>Converts a hash to a string representation of a UUID.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-hash%3D" class="source var-name" href="/src/byte_transforms.clj">hash=</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[a b]</div>
+            
+            
+            <div class="doc"><p>Returns true if the two hashes equal each other</p>
+</div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </body>
+
+</html>
