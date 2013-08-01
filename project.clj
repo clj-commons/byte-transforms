@@ -6,7 +6,8 @@
                  [primitive-math "0.1.2"]
                  [net.jpountz.lz4/lz4 "1.1.2"]
                  [org.xerial.snappy/snappy-java "1.1.0-M3"]
-                 [commons-codec/commons-codec "1.8"]]
+                 [commons-codec/commons-codec "1.8"]
+                 [reiddraper/simple-check "0.2.0"]]
    :profiles {:dev {:dependencies [[org.clojure/clojure "1.5.1"]
                                    [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]}}
   :plugins [[codox "0.6.4"]]
