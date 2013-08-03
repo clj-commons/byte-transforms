@@ -14,18 +14,18 @@
 
 (defn roundtrip-equiv
   [b comp-type]
-  (java.util.Arrays/equals b
-                           (-> b
-                             (bt/compress comp-type)
-                             (bt/decompress comp-type)
-                             bs/to-byte-array)))
+  (java.util.Arrays/equals
+    b
+    (-> b
+      (bt/compress comp-type)
+      (bt/decompress comp-type)
+      bs/to-byte-array)))
 
 (def roundtrip-property
   "Forall byte-arrays `b`, and compression types `comp-type`,
   compressing and then decompressing should be equal to the
   original byte-array"
-  (prop/for-all [b not-empty-byte-array
-                 comp-type compression-type]
-                (roundtrip-equiv b comp-type)))
+  (prop/for-all [b not-empty-byte-array, comp-type compression-type]
+    (roundtrip-equiv b comp-type)))
 
 (defspec roundtrip-compressors 10000 roundtrip-property)

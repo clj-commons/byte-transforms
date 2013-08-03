@@ -1,7 +1,7 @@
 (ns byte-transforms
   (:refer-clojure :exclude (byte-array hash))
   (:require
-    [byte-streams :refer (seq-of) :as bytes]
+    [byte-streams :refer (seq-of bytes=) :as bytes]
     [primitive-math :as p])
   (:import
     [byte_transforms
@@ -49,27 +49,27 @@
 (def ^:private decoders (atom {}))
 
 (defmacro def-hash [hash-name [bytes options] & body]
-  `(swap! byte-transforms/hash-functions assoc ~(name hash-name)
+  `(swap! byte-transforms/hash-functions assoc ~(keyword (name hash-name))
      (fn [~bytes ~(or options (gensym "options"))]
        ~@body)))
 
 (defmacro def-compressor [compressor-name [bytes options] & body]
-  `(swap! byte-transforms/compressors assoc ~(name compressor-name)
+  `(swap! byte-transforms/compressors assoc ~(keyword (name compressor-name))
      (fn [~bytes ~(or options (gensym "options"))]
        ~@body)))
 
 (defmacro def-decompressor [decompressor-name [bytes options] & body]
-  `(swap! byte-transforms/decompressors assoc ~(name decompressor-name)
+  `(swap! byte-transforms/decompressors assoc ~(keyword (name decompressor-name))
      (fn [~bytes ~(or options (gensym "options"))]
        ~@body)))
 
 (defmacro def-encoder [encoder-name [bytes options] & body]
-  `(swap! byte-transforms/encoders assoc ~(name encoder-name)
+  `(swap! byte-transforms/encoders assoc ~(keyword (name encoder-name))
      (fn [~bytes ~(or options (gensym "options"))]
        ~@body)))
 
 (defmacro def-decoder [decoder-name [bytes options] & body]
-  `(swap! byte-transforms/decoders assoc ~(name decoder-name)
+  `(swap! byte-transforms/decoders assoc ~(keyword (name decoder-name))
      (fn [~bytes ~(or options (gensym "options"))]
        ~@body)))
 
@@ -82,28 +82,13 @@
   []
   (keys @hash-functions))
 
-(defn hash
-  "Takes a byte stream, and returns a value representing its hash, which will be an integer if
-   the hash is 32 or 64-bit, or a byte array otherwise.  By default, this will use the Murmur64
-   hash."
-  ([bytes]
-     (hash bytes :murmur64))
-  ([bytes function]
-     (hash bytes function nil))
-  ([bytes function options]
-     (if-let [f (@hash-functions (name function))]
-       (f bytes options)
-       (throw
-         (IllegalArgumentException.
-           (str "Don't recognize hash function '" (name function) "'"))))))
-
 (defn hash=
   "Returns true if the two hashes equal each other"
   [a b]
   (if (and
         (instance? byte-array a)
         (instance? byte-array b))
-    (MessageDigest/isEqual a b)
+    (bytes= a b)
     (= a b)))
 
 (defn hash->bytes
@@ -142,8 +127,6 @@
         ary (long-array (p/>> (alength bytes) 3))]
     (-> bytes ByteBuffer/wrap .asLongBuffer (.get ary))
     ary))
-
-;;;
 
 ;; CRC32 hash
 (def-hash crc32
@@ -227,6 +210,28 @@
       (.putLong (aget ls 1))
       .array)))
 
+(let [murmur32 (get @hash-functions :murmur32)
+      murmur64 (get @hash-functions :murmur64)
+      murmur128 (get @hash-functions :murmur128)]
+  (defn hash
+    "Takes a byte stream, and returns a value representing its hash, which will be an integer if
+   the hash is 32 or 64-bit, or a byte array otherwise.  By default, this will use the murmur64
+   hash."
+    ([bytes]
+       (hash bytes :murmur64 nil))
+    ([bytes function]
+       (hash bytes function nil))
+    ([bytes function options]
+       (case function
+         :murmur32 (murmur32 bytes options)
+         :murmur64 (murmur64 bytes options)
+         :murmur128 (murmur128 bytes options)
+         (if-let [f (@hash-functions (keyword function))]
+           (f bytes options)
+           (throw
+             (IllegalArgumentException.
+               (str "Don't recognize hash function '" (name function) "'"))))))))
+
 ;;;
 
 (defn available-compressors []
@@ -239,7 +244,7 @@
   ([x algorithm]
      (compress x algorithm nil))
   ([x algorithm options]
-     (if-let [f (@compressors (name algorithm))]
+     (if-let [f (@compressors (keyword algorithm))]
        (f x options)
        (throw
          (IllegalArgumentException.
@@ -252,7 +257,7 @@
   ([x algorithm]
      (decompress x algorithm nil))
   ([x algorithm options]
-     (if-let [f (@decompressors (name algorithm))]
+     (if-let [f (@decompressors (keyword algorithm))]
        (f x options)
        (throw
          (IllegalArgumentException.
@@ -344,18 +349,18 @@
   ([x encoding]
      (encode x encoding nil))
   ([x encoding options]
-     (if-let [f (@encoders (name encoding))]
+     (if-let [f (@encoders (keyword encoding))]
        (f x options)
        (throw
          (IllegalArgumentException.
-           (str "Don't recognize encoding '" (name encoding) "'"))))))
+           (str "Don't recognize encoding '" encoding "'"))))))
 
 (defn decode
     "Takes an encoded byte stream, and returns a decoded version."
   ([x encoding]
      (decode x encoding nil))
   ([x encoding options]
-     (if-let [f (@decoders (name encoding))]
+     (if-let [f (@decoders (keyword encoding))]
        (f x options)
        (throw
          (IllegalArgumentException.

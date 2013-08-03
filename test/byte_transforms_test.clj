@@ -1,5 +1,6 @@
 (ns byte-transforms-test
   (:require
+    [criterium.core :as c]
     [clojure.test :refer :all]
     [byte-streams :as bs]
     [byte-transforms :as bt]))
@@ -113,3 +114,13 @@
     (bt/encode warmup-data c)
     (let [throughput (benchmark-encoding-fn c world-facts)]
       (println (format "%12s: %.2f MB/s" c throughput)))))
+
+;;;
+
+(deftest ^:benchmark benchmark-hash-function-latency
+  (let [s (apply str (repeat 32 "a"))
+        b (bs/to-byte-array s)]
+    (c/quick-bench
+      (bt/hash s :murmur64))
+    (c/quick-bench
+      (bt/hash b :murmur64))))
