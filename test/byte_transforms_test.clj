@@ -70,13 +70,22 @@
         (* len iterations 1000 (Math/pow 2 -20))
         (- end start)))))
 
+(defn measure-compression-fn [algorithm ^bytes data]
+  (float
+    (/
+      (alength data)
+      (-> data (bt/compress algorithm) bs/to-byte-array alength))))
+
 (deftest ^:benchmark benchmark-compression-algorithms
   (println "\ncompression roundtrip throughput:")
   (doseq [c (sort (bt/available-compressors))]
     ;; warmup
     (bt/compress warmup-data c)
     (let [throughput (benchmark-compression-fn c world-facts)]
-      (println (format "%12s: %.2f MB/s" c throughput)))))
+      (println (format "%12s: %.2f MB/s" c throughput))))
+  (println "\ncompression factor:")
+    (doseq [c (sort (bt/available-compressors))]
+      (println (format "%12s: %.2fx" c (measure-compression-fn c world-facts)))))
 
 ;;;
 
@@ -120,7 +129,9 @@
 (deftest ^:benchmark benchmark-hash-function-latency
   (let [s (apply str (repeat 32 "a"))
         b (bs/to-byte-array s)]
+    (println "bench murmur64 32-byte string")
     (c/quick-bench
       (bt/hash s :murmur64))
+    (println "bench murmur64 32-byte byte-array")
     (c/quick-bench
       (bt/hash b :murmur64))))

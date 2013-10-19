@@ -8,6 +8,8 @@
      CassandraMurmurHash]
     [java.util
      UUID]
+    [java.lang.reflect
+     Array]
     [java.util.zip
      CRC32
      Adler32
@@ -33,6 +35,11 @@
      LZ4BlockInputStream
      LZ4Factory
      LZ4Compressor]
+    [org.tukaani.xz
+     XZInputStream
+     XZOutputStream
+     FilterOptions
+     LZMA2Options]
     [org.apache.commons.codec.binary
      Base64]
     [org.xerial.snappy
@@ -99,11 +106,6 @@
     Integer   (-> (ByteBuffer/allocate 4) (.putInt (int x)) .array)
     Long      (-> (ByteBuffer/allocate 8) (.putLong (long x)) .array)))
 
-(defn hash->uuid
-  "Converts a hash to a string representation of a UUID."
-  [x]
-  (str (UUID/nameUUIDFromBytes (hash->bytes x))))
-
 (defn hash->shorts
   "Converts a hash to an array of shorts."
   [x]
@@ -127,6 +129,14 @@
         ary (long-array (p/>> (alength bytes) 3))]
     (-> bytes ByteBuffer/wrap .asLongBuffer (.get ary))
     ary))
+
+(defn hash->uuid
+  "Converts a 128-bit hash to a string representation of a UUID."
+  [x]
+  (let [^longs ary (hash->longs x)]
+    (when-not (== 2 (Array/getLength ary))
+      (throw (IllegalArgumentException. "Expected 128 bit input.")))
+    (str (UUID. (aget ary 0) (aget ary 1)))))
 
 ;; CRC32 hash
 (def-hash crc32
@@ -319,7 +329,7 @@
 
 (def-compressor lz4
   [x {:keys [safe? fastest? chunk-size]
-      :or {safe? false, fastest? false, chunk-size 1e5}
+      :or {safe? false, fastest? true, chunk-size 1e5}
       :as options}]
   (in->wrapped-out->in
     (bytes/to-input-stream x options)
@@ -336,6 +346,19 @@
 (def-decompressor lz4
   [x options]
   (LZ4BlockInputStream. (bytes/to-input-stream x options)))
+
+(def-compressor lzma2
+  [x {:keys [level]
+      :or {level 3}
+      :as options}]
+  (in->wrapped-out->in
+    (bytes/to-input-stream x options)
+    #(XZOutputStream. ^OutputStream % ^FilterOptions (LZMA2Options. level))
+    options))
+
+(def-decompressor lzma2
+  [x options]
+  (XZInputStream. (bytes/to-input-stream x options)))
 
 ;;;
 
