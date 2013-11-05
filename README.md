@@ -3,7 +3,7 @@ This library helps you **hash**, **compress**, and **encode** streams of bytes. 
 ## Usage
 
 ```clj
-[byte-transforms "0.1.0"]
+[byte-transforms "0.1.1"]
 ```
 
 All functions are in the `byte-transforms` namespace.  There are five primary functions, `hash`, `compress`, `decompress`, `encode`, and `decode`.  Each takes three arguments: the bytes, the method, and an (optional) options map.  The bytes can be anything which is part of the [byte-stream](https://github.com/ztellman/byte-streams) conversion graph.
@@ -34,7 +34,7 @@ byte-transforms> (available-encoders)
 ("base64")
 ```
 
-When choosing a compression algorithm, `snappy` is typically the fastest, and `lzma2` yields the highest compression.
+When choosing a compression algorithm, `snappy` is typically the fastest, and `lzma2` yields the highest compression.  Full stats on all methods can be found by cloning the project and running `lein test :benchmark`.
 
 ## License
 
