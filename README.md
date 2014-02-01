@@ -29,12 +29,12 @@ Available methods can be found via `available-hash-functions`, `available-compre
 byte-transforms> (available-hash-functions)
 ("sha384" "sha1" "sha256" "sha512" "crc32" "adler32" "murmur128" "md2" "md5" "murmur64" "murmur32")
 byte-transforms> (available-compressors)
-("lz4" "snappy" "gzip" "zlib" "lzma2)
+("bzip2" "snappy" "gzip" "zlib")
 byte-transforms> (available-encoders)
 ("base64")
 ```
 
-When choosing a compression algorithm, `snappy` is typically the fastest, and `lzma2` yields the highest compression.  Full stats on all methods can be found by cloning the project and running `lein test :benchmark`.
+When choosing a compression algorithm, `snappy` is typically the fastest, and `bzip2` yields the highest compression.  Full stats on all methods can be found by cloning the project and running `lein test :benchmark`.
 
 ## License
 

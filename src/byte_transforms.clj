@@ -13,8 +13,6 @@
     [java.util.zip
      CRC32
      Adler32
-     GZIPOutputStream
-     GZIPInputStream
      DeflaterInputStream
      InflaterInputStream]
     [java.io
@@ -30,18 +28,14 @@
      ShortBuffer
      IntBuffer
      LongBuffer]
-    [net.jpountz.lz4
-     LZ4BlockOutputStream
-     LZ4BlockInputStream
-     LZ4Factory
-     LZ4Compressor]
-    [org.tukaani.xz
-     XZInputStream
-     XZOutputStream
-     FilterOptions
-     LZMA2Options]
     [org.apache.commons.codec.binary
      Base64]
+    [org.apache.commons.compress.compressors.bzip2
+     BZip2CompressorInputStream
+     BZip2CompressorOutputStream]
+    [org.apache.commons.compress.compressors.gzip
+     GzipCompressorInputStream
+     GzipCompressorOutputStream]
     [org.xerial.snappy
      Snappy
      SnappyInputStream
@@ -282,13 +276,13 @@
   (InflaterInputStream. (bytes/to-input-stream x options)))
 
 (defn- in->wrapped-out->in [^InputStream stream output-wrapper options]
-  (let [out (PipedOutputStream.)
-        in (PipedInputStream. out)
+  (let [chunk-size (get options :chunk-size 65536)
+        out (PipedOutputStream.)
+        in (PipedInputStream. out chunk-size)
         ^OutputStream compressor (output-wrapper out)]
-    
     (future
       (try
-        (let [ary (clojure.core/byte-array (get options :chunk-size 4096))]
+        (let [ary (clojure.core/byte-array chunk-size)]
           (loop []
             (let [n (.read stream ary)]
               (when (pos? n)
@@ -304,16 +298,16 @@
   [x options]
   (in->wrapped-out->in
     (bytes/to-input-stream x options)
-    #(GZIPOutputStream. %)
+    #(GzipCompressorOutputStream. %)
     options))
 
 (def-decompressor gzip
   [x options]
-  (GZIPInputStream. (bytes/to-input-stream x options)))
+  (GzipCompressorInputStream. (bytes/to-input-stream x options)))
 
 (def-compressor snappy
   [x options]
-  (if (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x InputStream))
+  (if (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x (seq-of byte-array)))
     (Snappy/compress (bytes/to-byte-array x options))
     (map
       #(Snappy/compress ^bytes %)
@@ -327,38 +321,16 @@
       #(Snappy/uncompress ^bytes %)
       (bytes/to-byte-arrays x (update-in options [:chunk-size] #(or % 32278))))))
 
-(def-compressor lz4
-  [x {:keys [safe? fastest? chunk-size]
-      :or {safe? false, fastest? true, chunk-size 1e5}
-      :as options}]
+(def-compressor bzip2
+  [x options]
   (in->wrapped-out->in
     (bytes/to-input-stream x options)
-    #(LZ4BlockOutputStream. %
-       chunk-size
-       (let [^LZ4Factory factory (if safe?
-                                   (LZ4Factory/safeInstance)
-                                   (LZ4Factory/fastestInstance))]
-         (if fastest?
-           (.fastCompressor factory)
-           (.highCompressor factory))))
+    #(BZip2CompressorOutputStream. %)
     options))
 
-(def-decompressor lz4
+(def-decompressor bzip2
   [x options]
-  (LZ4BlockInputStream. (bytes/to-input-stream x options)))
-
-(def-compressor lzma2
-  [x {:keys [level]
-      :or {level 3}
-      :as options}]
-  (in->wrapped-out->in
-    (bytes/to-input-stream x options)
-    #(XZOutputStream. ^OutputStream % ^FilterOptions (LZMA2Options. level))
-    options))
-
-(def-decompressor lzma2
-  [x options]
-  (XZInputStream. (bytes/to-input-stream x options)))
+  (BZip2CompressorInputStream. (bytes/to-input-stream x options) true))
 
 ;;;
 
