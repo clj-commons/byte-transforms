@@ -5,6 +5,7 @@
   :dependencies [[byte-streams "0.1.9"]
                  [org.xerial.snappy/snappy-java "1.1.0.1"]
                  [commons-codec/commons-codec "1.9"]
+                 [org.anarres.lzo/lzo-core "1.0.0"]
                  [org.apache.commons/commons-compress "1.7"
                   :exclusions [org.tukaani/xz]]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.5.1"]

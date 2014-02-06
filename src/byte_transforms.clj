@@ -39,7 +39,11 @@
     [org.xerial.snappy
      Snappy
      SnappyInputStream
-     SnappyOutputStream]))
+     SnappyOutputStream]
+    [org.anarres.lzo
+     LzopInputStream
+     LzopOutputStream
+     LzoLibrary]))
 
 ;;;
 
@@ -331,6 +335,17 @@
 (def-decompressor bzip2
   [x options]
   (BZip2CompressorInputStream. (bytes/to-input-stream x options) true))
+
+(def-decompressor lzop
+  [x options]
+  (LzopInputStream. (bytes/to-input-stream x options)))
+
+(def-compressor lzop
+  [x options]
+  (in->wrapped-out->in
+    (bytes/to-input-stream x options)
+    #(LzopOutputStream. % (-> (LzoLibrary/getInstance) (.newCompressor nil nil)))
+    options))
 
 ;;;
 
