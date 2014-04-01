@@ -41,8 +41,9 @@
      SnappyInputStream
      SnappyOutputStream]
     [org.anarres.lzo
-     LzopInputStream
-     LzopOutputStream
+     LzoInputStream
+     LzoOutputStream
+     LzoDecompressor1x
      LzoLibrary]))
 
 ;;;
@@ -295,7 +296,7 @@
         (finally
           (.close compressor)
           (.close out))))
-    
+
     in))
 
 (def-compressor gzip
@@ -307,7 +308,7 @@
 
 (def-decompressor gzip
   [x options]
-  (GzipCompressorInputStream. (bytes/to-input-stream x options)))
+  (GzipCompressorInputStream. (bytes/to-input-stream x options) true))
 
 (def-compressor snappy
   [x options]
@@ -336,15 +337,17 @@
   [x options]
   (BZip2CompressorInputStream. (bytes/to-input-stream x options) true))
 
-(def-decompressor lzop
+(def-decompressor lzo
   [x options]
-  (LzopInputStream. (bytes/to-input-stream x options)))
+  (LzoInputStream. (bytes/to-input-stream x options) (LzoDecompressor1x.)))
 
-(def-compressor lzop
+(def-compressor lzo
   [x options]
   (in->wrapped-out->in
     (bytes/to-input-stream x options)
-    #(LzopOutputStream. % (-> (LzoLibrary/getInstance) (.newCompressor nil nil)))
+    #(LzoOutputStream. %
+       (-> (LzoLibrary/getInstance) (.newCompressor nil nil))
+       (* 25 1024))
     options))
 
 ;;;
