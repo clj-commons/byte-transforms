@@ -19,7 +19,8 @@
      OutputStream
      InputStream
      PipedInputStream
-     PipedOutputStream]
+     PipedOutputStream
+     ByteArrayOutputStream]
     [java.security
      MessageDigest]
     [java.nio
@@ -280,7 +281,8 @@
   [x options]
   (InflaterInputStream. (bytes/to-input-stream x options)))
 
-(defn- in->wrapped-out->in [^InputStream stream output-wrapper options]
+(defn- in->wrapped-out->in
+  [^InputStream stream output-wrapper options]
   (let [chunk-size (get options :chunk-size 65536)
         out (PipedOutputStream.)
         in (PipedInputStream. out chunk-size)
@@ -299,10 +301,33 @@
 
     in))
 
+(defn bytes->wrapped-out->bytes
+  [bytes output-wrapper options]
+  (if (or (instance? ByteBuffer bytes)
+        (instance? byte-array bytes))
+    (let [^ByteBuffer buf (bytes/to-byte-buffer bytes)
+          out (ByteArrayOutputStream.)
+          ^OutputStream compressor (output-wrapper out)
+          ^bytes ary (clojure.core/byte-array 1024)]
+      (loop []
+        (let [remaining (.remaining buf)]
+          (when (pos? remaining)
+            (let [len (p/min remaining 1024)]
+              (.get buf ary 0 len)
+              (.write compressor ary 0 len)
+              (recur)))))
+      (.close compressor)
+      (.close out)
+      (.toByteArray out))
+    (in->wrapped-out->in
+      (bytes/to-input-stream bytes options)
+      output-wrapper
+      options)))
+
 (def-compressor gzip
   [x options]
-  (in->wrapped-out->in
-    (bytes/to-input-stream x options)
+  (bytes->wrapped-out->bytes
+    x
     #(GzipCompressorOutputStream. %)
     options))
 
@@ -312,24 +337,36 @@
 
 (def-compressor snappy
   [x options]
-  (if (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x (seq-of byte-array)))
+  (cond
+    (instance? byte-array x)
+    (Snappy/compress ^bytes x)
+
+    (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x (seq-of byte-array)))
     (Snappy/compress (bytes/to-byte-array x options))
+
+    :else
     (map
       #(Snappy/compress ^bytes %)
       (bytes/to-byte-arrays x (update-in options [:chunk-size] #(or % 32278))))))
 
 (def-decompressor snappy
   [x options]
-  (if (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x (seq-of byte-array)))
+  (cond
+    (instance? byte-array x)
+    (Snappy/uncompress x)
+
+    (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x (seq-of byte-array)))
     (Snappy/uncompress (bytes/to-byte-array x options))
+
+    :else
     (map
       #(Snappy/uncompress ^bytes %)
       (bytes/to-byte-arrays x (update-in options [:chunk-size] #(or % 32278))))))
 
 (def-compressor bzip2
   [x options]
-  (in->wrapped-out->in
-    (bytes/to-input-stream x options)
+  (bytes->wrapped-out->bytes
+    x
     #(BZip2CompressorOutputStream. %)
     options))
 
@@ -343,8 +380,8 @@
 
 (def-compressor lzo
   [x options]
-  (in->wrapped-out->in
-    (bytes/to-input-stream x options)
+  (bytes->wrapped-out->bytes
+    x
     #(LzoOutputStream. %
        (-> (LzoLibrary/getInstance) (.newCompressor nil nil))
        (* 25 1024))
