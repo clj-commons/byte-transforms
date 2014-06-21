@@ -10,14 +10,14 @@
 
 (def compression-type (gen/elements (bt/available-compressors)))
 
-(def concat-compression-type (gen/elements [:gzip :bzip2 :lzo :snappy]))
+(def concat-compression-type (gen/elements [:gzip :bzip2 :snappy]))
 
 (def not-empty-byte-array (gen/such-that not-empty gen/bytes))
 
 (defn roundtrip-equiv
   [b comp-type]
   (java.util.Arrays/equals
-    b
+    ^bytes b
     (-> b
       (bt/compress comp-type)
       (bt/decompress comp-type)
@@ -26,7 +26,7 @@
 (defn concat-roundtrip-equiv
   [b chunk-size comp-type]
   (java.util.Arrays/equals
-    b
+    ^bytes b
     (->> (bs/to-byte-buffers b {:chunk-size chunk-size})
       (map #(bt/compress % comp-type))
       (#(bt/decompress % comp-type))

@@ -27,14 +27,16 @@ Available methods can be found via `available-hash-functions`, `available-compre
 
 ```clj
 byte-transforms> (available-hash-functions)
-(:sha384 :md2 :crc32 :sha512 :sha1 :murmur32 :murmur128 :adler32 :sha256 :md5 :murmur64)
+(:sha384 :md2 :crc32 :crc64 :sha512 :sha1 :murmur32 :murmur128 :adler32 :sha256 :md5 :murmur64)
 byte-transforms> (available-compressors)
-(:lzo :bzip2 :snappy :gzip :zlib)
+(:lz4 :bzip2 :snappy :gzip)
 byte-transforms> (available-encoders)
 (:base64)
 ```
 
-When choosing a compression algorithm, `snappy` is typically the fastest, and `bzip2` yields the highest compression.  Full stats on all methods can be found by cloning the project and running `lein test :benchmark`.
+When choosing a compression algorithm, `snappy` is typically the fastest, `bzip2` yields the highest compression, and `lz4` provides a good balance between higher compression rate and fast decompression.  All the compression algorithms except `lz4` are concat-able; multiple compressed segments can be concatenated and decompressed as a single stream.
+
+Full stats on all methods can be found by cloning the project and running `lein test :benchmark`.
 
 ## License
 

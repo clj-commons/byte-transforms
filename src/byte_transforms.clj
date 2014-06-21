@@ -5,22 +5,26 @@
     [primitive-math :as p])
   (:import
     [byte_transforms
-     CassandraMurmurHash]
+     CassandraMurmurHash
+     CRC64]
     [java.util
      UUID]
     [java.lang.reflect
      Array]
     [java.util.zip
      CRC32
-     Adler32
-     DeflaterInputStream
-     InflaterInputStream]
+     Adler32]
     [java.io
      OutputStream
      InputStream
      PipedInputStream
      PipedOutputStream
      ByteArrayOutputStream]
+    [net.jpountz.lz4
+     LZ4BlockOutputStream
+     LZ4BlockInputStream
+     LZ4Factory
+     LZ4Compressor]
     [java.security
      MessageDigest]
     [java.nio
@@ -40,12 +44,7 @@
     [org.xerial.snappy
      Snappy
      SnappyInputStream
-     SnappyOutputStream]
-    [org.anarres.lzo
-     LzoInputStream
-     LzoOutputStream
-     LzoDecompressor1x
-     LzoLibrary]))
+     SnappyOutputStream]))
 
 ;;;
 
@@ -142,7 +141,17 @@
 (def-hash crc32
   [x options]
   (let [crc (CRC32.)]
-    (when-let [seed (:seed options)]
+    (when-let [seed (get options :seed)]
+      (.update crc (byte seed)))
+    (doseq [^bytes ary (bytes/to-byte-arrays x options)]
+      (.update crc ary))
+    (.getValue crc)))
+
+;; CRC64 hash
+(def-hash crc64
+  [x options]
+  (let [crc (CRC64.)]
+    (when-let [seed (get options :seed)]
       (.update crc (byte seed)))
     (doseq [^bytes ary (bytes/to-byte-arrays x options)]
       (.update crc ary))
@@ -152,14 +161,14 @@
 (def-hash adler32
   [x options]
   (let [adler (Adler32.)]
-    (when-let [seed (:seed options)]
+    (when-let [seed (get options :seed)]
       (.update adler (byte seed)))
     (doseq [^bytes ary (bytes/to-byte-arrays x options)]
       (.update adler ary))
     (.getValue adler)))
 
 (defn- hash-digest [^MessageDigest digest bufs options]
-  (when-let [seed (:seed options)]
+  (when-let [seed (get options :seed)]
     (.update digest (byte seed)))
   (doseq [^ByteBuffer buf bufs]
     (.update digest buf))
@@ -222,7 +231,8 @@
 
 (let [murmur32 (get @hash-functions :murmur32)
       murmur64 (get @hash-functions :murmur64)
-      murmur128 (get @hash-functions :murmur128)]
+      murmur128 (get @hash-functions :murmur128)
+      crc64 (get @hash-functions :crc64)]
   (defn hash
     "Takes a byte stream, and returns a value representing its hash, which will be an integer if
    the hash is 32 or 64-bit, or a byte array otherwise.  By default, this will use the murmur64
@@ -236,6 +246,7 @@
          :murmur32 (murmur32 bytes options)
          :murmur64 (murmur64 bytes options)
          :murmur128 (murmur128 bytes options)
+         :crc64 (crc64 bytes options)
          (if-let [f (@hash-functions (keyword function))]
            (f bytes options)
            (throw
@@ -272,14 +283,6 @@
        (throw
          (IllegalArgumentException.
            (str "Don't recognize decompressor '" (name algorithm) "'"))))))
-
-(def-compressor zlib
-  [x options]
-  (DeflaterInputStream. (bytes/to-input-stream x options)))
-
-(def-decompressor zlib
-  [x options]
-  (InflaterInputStream. (bytes/to-input-stream x options)))
 
 (defn- in->wrapped-out->in
   [^InputStream stream output-wrapper options]
@@ -374,18 +377,26 @@
   [x options]
   (BZip2CompressorInputStream. (bytes/to-input-stream x options) true))
 
-(def-decompressor lzo
-  [x options]
-  (LzoInputStream. (bytes/to-input-stream x options) (LzoDecompressor1x.)))
-
-(def-compressor lzo
-  [x options]
+(def-compressor lz4
+  [x {:keys [safe? fastest? chunk-size]
+      :or {safe? false, fastest? false, chunk-size 1e5}
+      :as options}]
   (bytes->wrapped-out->bytes
     x
-    #(LzoOutputStream. %
-       (-> (LzoLibrary/getInstance) (.newCompressor nil nil))
-       (* 25 1024))
+    #(LZ4BlockOutputStream. %
+       chunk-size
+       (let [^LZ4Factory factory (if safe?
+                                   (LZ4Factory/safeInstance)
+                                   (LZ4Factory/fastestInstance))]
+         (if fastest?
+           (.fastCompressor factory)
+           (.highCompressor factory))))
     options))
+
+(def-decompressor lz4
+  [x options]
+  (LZ4BlockInputStream. (bytes/to-input-stream x options)))
+
 
 ;;;
 

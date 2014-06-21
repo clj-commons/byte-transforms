@@ -1,14 +1,14 @@
-(defproject byte-transforms "0.1.3-SNAPSHOT"
+(defproject byte-transforms "0.1.3"
   :description "Methods for hashing, compressing, and encoding bytes."
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
-  :dependencies [[byte-streams "0.1.11-SNAPSHOT"]
+  :dependencies [[byte-streams "0.1.11"]
                  [org.xerial.snappy/snappy-java "1.1.0.1"]
                  [commons-codec/commons-codec "1.9"]
-                 [org.anarres.lzo/lzo-core "1.0.0"]
+                 [net.jpountz.lz4/lz4 "1.2.0"]
                  [org.apache.commons/commons-compress "1.8"
                   :exclusions [org.tukaani/xz]]]
-  :profiles {:dev {:dependencies [[org.clojure/clojure "1.5.1"]
+  :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
                                   [criterium "0.4.3"]
                                   [reiddraper/simple-check "0.5.6"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]}}

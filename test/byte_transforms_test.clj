@@ -54,21 +54,20 @@
 (defn benchmark-compression-fn [algorithm ^bytes data]
   (let [len (alength data)
         now #(System/currentTimeMillis)
-        start (now)
-        iterations (loop [cnt 0]
-                     (if (< (- (now) start) 2000)
-                       (do
-                         (-> data
-                           (bt/compress algorithm)
-                           (bt/decompress algorithm)
-                           bs/to-byte-array)
-                         (recur (inc cnt)))
-                       cnt))
-        end (now)]
-    (float
-      (/
-        (* len iterations 1000 (Math/pow 2 -20))
-        (- end start)))))
+        measure (fn [f]
+                  (let [start (now)]
+                    (loop [cnt 0]
+                      (if (< (- (now) start) 2000)
+                        (do (f) (recur (inc cnt)))
+                        (let [end (now)]
+                          (float
+                            (/
+                              (* len cnt 1000 (Math/pow 2 -20))
+                              (- end start))))))))
+        compressed-data (-> data (bt/compress algorithm) bs/to-byte-array)]
+    [(measure #(-> data (bt/compress algorithm) (bt/decompress algorithm) bs/to-byte-array))
+     (measure #(-> data (bt/compress algorithm) bs/to-byte-array))
+     (measure #(-> compressed-data (bt/decompress algorithm) bs/to-byte-array))]))
 
 (defn measure-compression-fn [algorithm ^bytes data]
   (float
@@ -77,12 +76,16 @@
       (-> data (bt/compress algorithm) bs/to-byte-array alength))))
 
 (deftest ^:benchmark benchmark-compression-algorithms
-  (println "\ncompression roundtrip throughput:")
+  (println "\ncompression throughput:")
   (doseq [c (sort (bt/available-compressors))]
     ;; warmup
     (bt/compress warmup-data c)
-    (let [throughput (benchmark-compression-fn c world-facts)]
-      (println (format "%12s: %.2f MB/s" c throughput))))
+    (let [[roundtrip compress decompress] (benchmark-compression-fn c world-facts)]
+      (println (format "%12s: roundtrip %.2f MB/s, compress %.2f MB/s, decompress %.2f MB/s"
+                 c
+                 roundtrip
+                 compress
+                 decompress))))
   (println "\ncompression factor:")
     (doseq [c (sort (bt/available-compressors))]
       (println (format "%12s: %.2fx" c (measure-compression-fn c world-facts)))))
