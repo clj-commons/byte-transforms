@@ -3,7 +3,7 @@ This library helps you **hash**, **compress**, and **encode** streams of bytes. 
 ## Usage
 
 ```clj
-[byte-transforms "0.1.2"]
+[byte-transforms "0.1.3"]
 ```
 
 All functions are in the `byte-transforms` namespace.  There are five primary functions, `hash`, `compress`, `decompress`, `encode`, and `decode`.  Each takes three arguments: the bytes, the method, and an (optional) options map.  The bytes can be anything which is part of the [byte-stream](https://github.com/ztellman/byte-streams) conversion graph.
