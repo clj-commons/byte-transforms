@@ -363,7 +363,8 @@
     (instance? byte-array x)
     (Snappy/uncompress x)
 
-    (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x (seq-of byte-array)))
+    (and (not (seq? x))
+      (<= (bytes/conversion-cost x byte-array) (bytes/conversion-cost x (seq-of byte-array))))
     (Snappy/uncompress (bytes/to-byte-array x options))
 
     :else

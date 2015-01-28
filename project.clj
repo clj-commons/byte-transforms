@@ -10,7 +10,7 @@
                   :exclusions [org.tukaani/xz]]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
                                   [criterium "0.4.3"]
-                                  [reiddraper/simple-check "0.5.6"]
+                                  [org.clojure/test.check "0.7.0"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]}}
   :plugins [[codox "0.6.4"]]
   :codox {:writer codox-md.writer/write-docs

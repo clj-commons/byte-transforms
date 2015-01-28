@@ -3,16 +3,16 @@
     [clojure.test :refer :all]
     [byte-streams :as bs]
     [byte-transforms :as bt]
-    [simple-check.core :as sc]
-    [simple-check.generators :as gen]
-    [simple-check.properties :as prop]
-    [simple-check.clojure-test :as ct :refer (defspec)]))
+    [clojure.test.check.clojure-test :as ct :refer (defspec)]
+    [clojure.test.check
+     [generators :as gen]
+     [properties :as prop]]))
 
 (def compression-type (gen/elements (bt/available-compressors)))
 
 (def concat-compression-type (gen/elements [:gzip :bzip2 :snappy]))
 
-(def not-empty-byte-array (gen/such-that not-empty gen/bytes))
+(def not-empty-byte-array (gen/such-that #(pos? (count %)) gen/bytes))
 
 (defn roundtrip-equiv
   [b comp-type]
