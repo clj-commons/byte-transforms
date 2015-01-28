@@ -1,8 +1,8 @@
-(defproject byte-transforms "0.1.3"
+(defproject byte-transforms "0.1.4-SNAPSHOT"
   :description "Methods for hashing, compressing, and encoding bytes."
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
-  :dependencies [[byte-streams "0.1.11"]
+  :dependencies [[byte-streams "0.2.0-SNAPSHOT"]
                  [org.xerial.snappy/snappy-java "1.1.0.1"]
                  [commons-codec/commons-codec "1.9"]
                  [net.jpountz.lz4/lz4 "1.2.0"]

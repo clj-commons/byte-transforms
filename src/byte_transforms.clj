@@ -40,7 +40,8 @@
      BZip2CompressorOutputStream]
     [org.apache.commons.compress.compressors.gzip
      GzipCompressorInputStream
-     GzipCompressorOutputStream]
+     GzipCompressorOutputStream
+     GzipParameters]
     [org.xerial.snappy
      Snappy
      SnappyInputStream
@@ -328,10 +329,14 @@
       options)))
 
 (def-compressor gzip
-  [x options]
+  [x {:keys [compression-level] :as options}]
   (bytes->wrapped-out->bytes
     x
-    #(GzipCompressorOutputStream. %)
+    (if compression-level
+      #(GzipCompressorOutputStream. %
+         (doto (GzipParameters.)
+           (.setCompressionLevel compression-level)))
+      #(GzipCompressorOutputStream. %))
     options))
 
 (def-decompressor gzip
@@ -396,7 +401,6 @@
 (def-decompressor lz4
   [x options]
   (LZ4BlockInputStream. (bytes/to-input-stream x options)))
-
 
 ;;;
 
