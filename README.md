@@ -17,11 +17,13 @@ byte-transforms> (compress "hello" :snappy)
 byte-transforms> (byte-streams/to-string (decompress *1 :snappy))
 "hello"
 
-byte-transforms> (byte-streams/to-string (encode "hello" :base64 {:url-safe? true}))
+byte-transforms> (byte-streams/to-string (encode "hello" :base64 {:url-safe? false}))
 "aGVsbG8"
 byte-transforms> (byte-streams/to-string (decode *1 :base64))
 "hello"
 ```
+
+Note that Base64 encoding defaults to the [URL-safe](https://en.wikipedia.org/wiki/Base64#URL_applications) variant, which means that the output will not be padded.  This can be disabled by passing in `{:url-safe? false}` to `encode`.
 
 Available methods can be found via `available-hash-functions`, `available-compressors`, and `available-encoders`:
 
