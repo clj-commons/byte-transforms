@@ -1,3 +1,7 @@
+[![Clojars Project](https://img.shields.io/clojars/v/byte-transforms.svg)](https://clojars.org/byte-transforms)
+[![cljdoc badge](https://cljdoc.org/badge/byte-transforms)](https://cljdoc.org/d/byte-transforms)
+[![CircleCI](https://circleci.com/gh/clj-commons/byte-transforms.svg?style=svg)](https://circleci.com/gh/clj-commons/byte-transforms)
+
 This library helps you **hash**, **compress**, and **encode** streams of bytes.  It contains the methods in the standard Java lib, as well as a curated collection of the best available methods.
 
 ## Usage
