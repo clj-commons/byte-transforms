@@ -15,7 +15,6 @@
   :codox {:writer codox-md.writer/write-docs
           :include [byte-transforms]}
   :java-source-paths ["src"]
-  :javac-options ["-target" "1.5" "-source" "1.5"]
   :global-vars {*warn-on-reflection* true}
   :jvm-opts ^:replace ["-server"]
   :test-selectors {:default (complement :benchmark)
