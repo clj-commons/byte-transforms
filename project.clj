@@ -6,7 +6,7 @@
                  [org.xerial.snappy/snappy-java "1.1.1.7"]
                  [commons-codec/commons-codec "1.10"]
                  [net.jpountz.lz4/lz4 "1.3"]
-                 [org.apache.commons/commons-compress "1.9"]]
+                 [org.apache.commons/commons-compress "1.18"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.7.0-alpha6"]
                                   [criterium "0.4.3"]
                                   [org.clojure/test.check "0.7.0"]
