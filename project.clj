@@ -2,6 +2,10 @@
   :description "Methods for hashing, compressing, and encoding bytes."
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
+  :deploy-repositories [["clojars" {:url "https://repo.clojars.org"
+                                    :username :env/clojars_username
+                                    :password :env/clojars_password
+                                    :sign-releases true}]]
   :dependencies [[byte-streams "0.2.0"]
                  [org.xerial.snappy/snappy-java "1.1.1.7"]
                  [commons-codec/commons-codec "1.10"]
