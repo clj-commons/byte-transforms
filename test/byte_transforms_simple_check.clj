@@ -6,7 +6,8 @@
     [clojure.test.check.clojure-test :as ct :refer (defspec)]
     [clojure.test.check
      [generators :as gen]
-     [properties :as prop]]))
+     [properties :as prop]])
+  (:import (java.util Arrays)))
 
 (def compression-type (gen/elements (bt/available-compressors)))
 
@@ -16,21 +17,21 @@
 
 (defn roundtrip-equiv
   [b comp-type]
-  (java.util.Arrays/equals
+  (Arrays/equals
     ^bytes b
     (-> b
-      (bt/compress comp-type)
-      (bt/decompress comp-type)
-      bs/to-byte-array)))
+        (bt/compress comp-type)
+        (bt/decompress comp-type)
+        bs/to-byte-array)))
 
 (defn concat-roundtrip-equiv
   [b chunk-size comp-type]
-  (java.util.Arrays/equals
+  (Arrays/equals
     ^bytes b
     (->> (bs/to-byte-buffers b {:chunk-size chunk-size})
-      (map #(bt/compress % comp-type))
-      (#(bt/decompress % comp-type))
-      bs/to-byte-array)))
+         (map #(bt/compress % comp-type))
+         (#(bt/decompress % comp-type))
+         bs/to-byte-array)))
 
 (def roundtrip-property
   "Forall byte-arrays `b`, and compression types `comp-type`,

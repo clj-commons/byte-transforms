@@ -1,0 +1,12 @@
+=== 0.2.0
+
+* Bumped snappy-java dep to 1.1.8.3 to support Apple Silicon
+
+Contributions by Zac Xu
+
+=== Pre-0.2.0
+
+Created by Zach Tellman.
+
+Contributions Zach Tellman, Erik Assum, Matthew Davidson, Ganesh Gautam, and Reid Draper.
+
