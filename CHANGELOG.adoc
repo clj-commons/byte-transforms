@@ -1,3 +1,7 @@
+=== 0.2.1
+
+* Changed group to org.clj-commons
+
 === 0.2.0
 
 * Bumped snappy-java dep to 1.1.8.3 to support Apple Silicon

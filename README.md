@@ -8,12 +8,11 @@ This library helps you **hash**, **compress**, and **encode** streams of bytes. 
 
 #### Leiningen
 ```clojure
-;;; For Leiningen
-[clj-commons/byte-transforms "0.2.0"]
+[org.clj-commons/byte-transforms "0.2.1"]
 ```
 #### deps.edn
 ```clojure
-clj-commons/byte-transforms {:mvn/version "0.2.0"}
+org.clj-commons/byte-transforms {:mvn/version "0.2.1"}
 ```
 
 All functions are in the `byte-transforms` namespace.  There are five primary functions, `hash`, `compress`, `decompress`, `encode`, and `decode`.  Each takes three arguments: the bytes, the method, and an (optional) options map.  The bytes can be anything which is part of the [byte-stream](https://github.com/ztellman/byte-streams) conversion graph.
@@ -40,8 +39,10 @@ Available methods can be found via `available-hash-functions`, `available-compre
 ```clojure
 byte-transforms> (available-hash-functions)
 (:sha384 :md2 :crc32 :crc64 :sha512 :sha1 :murmur32 :murmur128 :adler32 :sha256 :md5 :murmur64)
+
 byte-transforms> (available-compressors)
 (:lz4 :bzip2 :snappy :gzip)
+
 byte-transforms> (available-encoders)
 (:base64)
 ```

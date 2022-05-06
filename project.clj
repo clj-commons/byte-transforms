@@ -1,4 +1,4 @@
-(defproject clj-commons/byte-transforms (or (System/getenv "PROJECT_VERSION") "0.2.0")
+(defproject org.clj-commons/byte-transforms (or (System/getenv "PROJECT_VERSION") "0.2.1")
   :description "Methods for hashing, compressing, and encoding bytes."
   :license {:name "Apache License 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
