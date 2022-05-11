@@ -7,7 +7,7 @@
                                     :password :env/clojars_password
                                     :sign-releases true}]]
   :dependencies [[byte-streams "0.2.0"]
-                 [org.xerial.snappy/snappy-java "1.1.8.3"]
+                 [org.xerial.snappy/snappy-java "1.1.8.4"]
                  [commons-codec/commons-codec "1.10"]
                  [net.jpountz.lz4/lz4 "1.3"]
                  [org.apache.commons/commons-compress "1.20"]]
